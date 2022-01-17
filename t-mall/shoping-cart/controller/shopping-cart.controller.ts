@@ -16,7 +16,7 @@ export class ShoppingCartController {
   /**
    * 查看购物车详情
    */
-  public getDetail(): ShoppingCartDetailDto {
-    this.shoppingCartService.getDetail();
+  public getDetail(): ShoppingCartDetailDto | null {
+    return this.shoppingCartService.getDetail();
   }
 }

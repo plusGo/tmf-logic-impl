@@ -6,6 +6,7 @@ import { ShoppingCartDetailDto } from '../model/dto/shopping-cart-detail.dto';
 import { TokenUtil } from '../../../core/util/token.util';
 import { Logger } from '../../../core/util/logger';
 import { ProductSkuController } from '../../temporal/controller/product-sku.controller';
+import { UserToken } from '../../../core/model/dto/user-token.model';
 
 @Injectable()
 export class ShoppingCartService {
@@ -27,7 +28,20 @@ export class ShoppingCartService {
     Logger.log('ShoppingCartService', '购物车添加商品成功', 'skuId', skuId, '新增数量', `${quantity}`);
   }
 
-  getDetail(): ShoppingCartDetailDto {
-    const curUser = TokenUtil.getCurrentUser();
+  getDetail(): ShoppingCartDetailDto | null {
+    const curUser = TokenUtil.getCurrentUser() as UserToken;
+    if (!curUser) {
+      return null;
+    }
+    const items = this.shoppingCartItemRepository.query([{ field: 'createBy', value: curUser.id as string }]);
+
+    return {
+      items: items.map((item) => {
+        return {
+          sku: this.productSkuController.getDetail(item.skuId),
+          quantity: item.quantity,
+        };
+      }),
+    };
   }
 }

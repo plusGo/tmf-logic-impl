@@ -13,4 +13,8 @@ export class ProductSkuController {
   public save(sku: SkuSaveRequest): SkuDto {
     return this.productSkuService.save(sku);
   }
+
+  getDetail(skuId: string): SkuDto {
+    return this.productSkuService.getDetail(skuId);
+  }
 }

@@ -78,4 +78,10 @@ export class ProductSkuService {
     });
     return ret;
   }
+
+  getDetail(skuId: string): SkuDto {
+    const sku = this.productSkuRepository.findById(skuId);
+    // todo
+    return undefined;
+  }
 }
