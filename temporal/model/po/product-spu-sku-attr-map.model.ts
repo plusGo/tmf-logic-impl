@@ -13,6 +13,6 @@ export interface ProductSpuSkuAttrMap extends BaseModel {
   skuId: string;
   attrId: string;
   attrName: string;
-  attr_value_id: string;
-  attr_value_name: string; // 销售属性值
+  attrValueId: string;
+  attrValueName: string; // 销售属性值
 }

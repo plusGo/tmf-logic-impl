@@ -17,6 +17,10 @@ export abstract class BaseRepository<T extends BaseModel> {
     this.storageConnection.addOne(value);
   }
 
+  query(words: { field: string; value: string | number }[]): T[] {
+    return this.storageConnection.query(words);
+  }
+
   findById(id: string): T | null {
     return this.storageConnection.findById(id);
   }

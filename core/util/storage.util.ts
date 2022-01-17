@@ -1,4 +1,6 @@
-export class StorageConnection<T extends { id: string }> {
+import { BaseModel } from '../model/po/base.model';
+
+export class StorageConnection<T extends BaseModel> {
   private cache: T[] = [];
 
   constructor(private storage: Storage, private domain: string) {
@@ -10,13 +12,19 @@ export class StorageConnection<T extends { id: string }> {
     this.storage.setItem(this.getKey(), JSON.stringify(this.cache));
   }
 
+  query(words: { field: string; value: string | number }[]): T[] {
+    return this.findAll().filter((item) => {
+      return words.every((word) => (item as any)[word.field] === word.value);
+    });
+  }
+
   addOne(value: T): void {
     this.cache.push(value);
     this.storage.setItem(this.getKey(), JSON.stringify(this.cache));
   }
 
   findById(id: string): T | null {
-    return this.findAll().find(item => item.id === id) || null;
+    return this.findAll().find((item) => item.id === id) || null;
   }
 
   findAll(): T[] {

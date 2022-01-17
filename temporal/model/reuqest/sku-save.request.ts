@@ -6,7 +6,6 @@ import { ProductAttrValue } from '../po/product-attr-value.model';
 
 export interface SkuSaveRequest {
   spu: ProductSpu;
-  name: string;
   attrValues: ProductAttrValue[];
   price: string;
   marketPrice: string;
