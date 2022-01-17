@@ -21,4 +21,11 @@ export class AccountUserController {
   public login(mobile: string, password: string): UserToken {
     return this.accountUserService.login(mobile, password);
   }
+
+  /**
+   *  登出
+   */
+  public logout(): void {
+    this.accountUserService.logout();
+  }
 }

@@ -9,21 +9,30 @@ import { TokenUtil } from '../../core/util/token.util';
 
 @Injectable()
 export class AccountUserService {
-  private accountUserRepository: AccountUserRepository = inject(AccountUserRepository);
+  private accountUserRepository: AccountUserRepository = inject(
+    AccountUserRepository,
+  );
 
   register(account: AccountRegisterRequest): AccountUser {
     const newAccount = {
       ...account,
       id: IdUtil.UUID(),
     };
-    this.accountUserRepository.addOne(newAccount);
-    Logger.log('AccountUserService', '用户注册成功', JSON.stringify(newAccount));
+    this.accountUserRepository.save(newAccount);
+    Logger.log(
+      'AccountUserService',
+      '用户注册成功',
+      JSON.stringify(newAccount),
+    );
     return newAccount;
   }
 
   login(phone: string, password: string): UserToken {
-    const curAccount = this.accountUserRepository.findAll()
-      .find(account => account.phone === phone && account.password === password);
+    const curAccount = this.accountUserRepository
+      .findAll()
+      .find(
+        (account) => account.phone === phone && account.password === password,
+      );
     if (!curAccount) {
       throw new Error('用户不存在，无法登录');
     } else {
@@ -33,5 +42,9 @@ export class AccountUserService {
       TokenUtil.setCurrentUser(userToken);
       return userToken;
     }
+  }
+
+  logout(): void {
+    TokenUtil.removeCurrentUser();
   }
 }

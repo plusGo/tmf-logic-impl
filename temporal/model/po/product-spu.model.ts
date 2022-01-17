@@ -12,8 +12,7 @@ export interface ProductSpu extends BaseModel {
   sellingPoint: string; // 卖点
   unit: string; // spu单位
   priceFree: number; // 售价，整数方式保存
-  priceScale: number;// 售价，金额对应的小数位数
+  priceScale: number; // 售价，金额对应的小数位数
   marketPriceFree: number; // 市场价,整数方式保存
-  marketPriceScale: number;// 市场价，金额对应的小数位数
-
+  marketPriceScale: number; // 市场价，金额对应的小数位数
 }

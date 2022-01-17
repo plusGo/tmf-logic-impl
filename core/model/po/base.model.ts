@@ -1,4 +1,5 @@
 export interface BaseModel {
+  id: string;
   createAt?: number; // 创建时间
   createBy?: string; // 创建人
   createIP?: string; // 创建IP
