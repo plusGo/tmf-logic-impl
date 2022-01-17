@@ -14,11 +14,23 @@ export abstract class BaseRepository<T extends BaseModel> {
     if (curUser) {
       value.createBy = curUser.id;
     }
-    this.storageConnection.addOne(value);
+    this.storageConnection.save(value);
+  }
+
+  deleteById(id: string): void {
+    this.storageConnection.deleteById(id);
+  }
+
+  updateOne(id: string, value: Partial<T>): void {
+    this.storageConnection.updateOne(id, value);
   }
 
   query(words: { field: string; value: string | number }[]): T[] {
     return this.storageConnection.query(words);
+  }
+
+  queryOne(words: { field: string; value: string | number }[]): T | null {
+    return this.query(words)[0];
   }
 
   findById(id: string): T | null {

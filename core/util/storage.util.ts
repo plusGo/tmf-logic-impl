@@ -18,9 +18,24 @@ export class StorageConnection<T extends BaseModel> {
     });
   }
 
-  addOne(value: T): void {
+  save(value: T): void {
     this.cache.push(value);
     this.storage.setItem(this.getKey(), JSON.stringify(this.cache));
+  }
+
+  deleteById(id: string): void {
+    this.cache = this.cache.filter((item) => item.id !== id);
+    this.storage.setItem(this.getKey(), JSON.stringify(this.cache));
+  }
+
+  updateOne(id: string, value: Partial<T>): void {
+    const obj: any = this.findById(id);
+    if (obj) {
+      Object.keys(value).forEach((key) => {
+        obj[key] = (value as any)[key];
+      });
+      this.storage.setItem(this.getKey(), JSON.stringify(this.cache));
+    }
   }
 
   findById(id: string): T | null {

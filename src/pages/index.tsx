@@ -1,13 +1,14 @@
 import styles from './index.less';
-import { TradeController } from '../../trade/controller/trade-controller';
+import { TradeController } from '../../t-mall/trade/controller/trade-controller';
 import { inject } from '../../core/util/bean-factory';
-import { AccountUserController } from '../../account/controller/account-user.controller';
+import { AccountUserController } from '../../t-mall/account/controller/account-user.controller';
 import { TokenUtil } from '../../core/util/token.util';
-import { ProductBrandsController } from '../../temporal/controller/product-brands.controller';
-import { ProductCategoryController } from '../../temporal/controller/product-category.controller';
-import { ProductSpuController } from '../../temporal/controller/product-spu.controller';
-import { ProductAttrController } from '../../temporal/controller/product-attr.controller';
-import { ProductSkuController } from '../../temporal/controller/product-sku.controller';
+import { ProductBrandsController } from '../../t-mall/temporal/controller/product-brands.controller';
+import { ProductCategoryController } from '../../t-mall/temporal/controller/product-category.controller';
+import { ProductSpuController } from '../../t-mall/temporal/controller/product-spu.controller';
+import { ProductAttrController } from '../../t-mall/temporal/controller/product-attr.controller';
+import { ProductSkuController } from '../../t-mall/temporal/controller/product-sku.controller';
+import { ShoppingCartController } from '../../t-mall/shoping-cart/controller/shopping-cart.controller';
 
 export default function IndexPage() {
   const userController = inject<AccountUserController>(AccountUserController);
@@ -16,6 +17,7 @@ export default function IndexPage() {
   const productSpuController = inject<ProductSpuController>(ProductSpuController);
   const productAttrController = inject<ProductAttrController>(ProductAttrController);
   const productSkuController = inject<ProductSkuController>(ProductSkuController);
+  const shoppingCartController = inject<ShoppingCartController>(ShoppingCartController);
 
   // 注册用户
   userController.register({
@@ -69,7 +71,7 @@ export default function IndexPage() {
     ],
   });
   // 创建sku 银色13寸 1000台
-  productSkuController.save({
+  const sku1 = productSkuController.save({
     spu,
     price: '10999.99',
     marketPrice: '11999.99',
@@ -77,7 +79,7 @@ export default function IndexPage() {
     attrValues: [attr1.values[0], attr2.values[0]],
   });
   // 创建sku 黑色13寸 500台
-  productSkuController.save({
+  const sku2 = productSkuController.save({
     spu,
     price: '10999.99',
     marketPrice: '11999.99',
@@ -85,7 +87,7 @@ export default function IndexPage() {
     attrValues: [attr1.values[1], attr2.values[0]],
   });
   // 创建sku 银色14寸 1000台
-  productSkuController.save({
+  const sku3 = productSkuController.save({
     spu,
     price: '11999.99',
     marketPrice: '12999.99',
@@ -93,17 +95,21 @@ export default function IndexPage() {
     attrValues: [attr1.values[0], attr2.values[1]],
   });
   // 创建sku 黑色14寸 500台
-  productSkuController.save({
+  const sku4 = productSkuController.save({
     spu,
     price: '11999.99',
     marketPrice: '12999.99',
     quantity: 200,
     attrValues: [attr1.values[1], attr2.values[1]],
   });
+  // 买100台 Mac pro 黑色14寸
+  shoppingCartController.saveSKU(sku4.id, 100);
+  shoppingCartController.saveSKU(sku4.id, 100);
+  // 买200台 Mac pro 黑色13寸
+  shoppingCartController.saveSKU(sku3.id, 200);
   // 获取spu详情
   const spuDetail = productSpuController.getDetail(spu.id);
   console.log(spuDetail);
-  // 从天猫APP获取一个商品，例如MAC BOOK
 
   const a = inject<TradeController>(TradeController);
   a.goPay();
