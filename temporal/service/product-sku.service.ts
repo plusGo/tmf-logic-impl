@@ -10,6 +10,7 @@ import { ProductAttr } from '../model/po/product-attr.model';
 import { ProductSpuSkuAttrMapRepository } from '../dao/product-spu-sku-attr-map.repository';
 import { ProductSpuSkuAttrMapService } from './product-spu-sku-attr-map.service';
 import { ProductSkuStockService } from './product-sku-stock.service';
+import { Logger } from '../../core/util/logger';
 
 @Injectable()
 export class ProductSkuService {
@@ -53,6 +54,9 @@ export class ProductSkuService {
     });
 
     const skuName = `${sku.spu.name}${sku.attrValues.map((item) => item.value).join('')}`;
+
+    Logger.log('ProductSkuService', '创建SKU成功', 'SKU名称', skuName, '库存', `${sku.quantity}`);
+
     return {
       id: newSku.id,
       name: skuName,

@@ -9,6 +9,7 @@ import { ProductAttrService } from './product-attr.service';
 import { ProductSpuSkuAttrMapService } from './product-spu-sku-attr-map.service';
 import { ProductSkuStockService } from './product-sku-stock.service';
 import { ProductSkuService } from './product-sku.service';
+import { Logger } from '../../core/util/logger';
 
 @Injectable()
 export class ProductSpuService {
@@ -35,6 +36,9 @@ export class ProductSpuService {
       id: IdUtil.UUID(),
     };
     this.productSpuRepository.save(newSpu);
+
+    Logger.log('ProductSpuService', 'SPU创建成功', 'SPU名称', newSpu.name);
+
     return newSpu;
   }
 

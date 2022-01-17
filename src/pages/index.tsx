@@ -32,16 +32,10 @@ export default function IndexPage() {
   const curUser = TokenUtil.getCurrentUser();
 
   // 创建品牌
-  const brands = productBrandsController.save({
-    name: 'Apple',
-    desc: '经营手机、电脑、耳机等数字产品牌',
-  });
+  const brands = productBrandsController.save({ name: 'Apple', desc: '经营手机、电脑、耳机等数字产品牌' });
 
   // 创建类别
-  const category = productCategoryController.save({
-    name: '笔记本',
-    desc: '便携袋的微型电脑',
-  });
+  const category = productCategoryController.save({ name: '笔记本', desc: '便携袋的微型电脑' });
 
   // 创建一个spu
   const spu = productSpuController.save({
