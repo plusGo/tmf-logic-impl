@@ -10,7 +10,10 @@ export class ProductSpuSkuAttrMapService {
    *  spu下有哪些sku
    */
   public getSkuIds(spuId: string): string[] {
-    const skuIds = this.productSpuSkuAttrMapRepository.query([{ field: 'spuId', value: spuId }]).map((item) => item.skuId);
+    const skuIds = this.productSpuSkuAttrMapRepository.query([{
+      field: 'spuId',
+      value: spuId,
+    }]).map((item) => item.skuId);
     return ArrayUtil.unique(skuIds);
   }
 
@@ -18,7 +21,10 @@ export class ProductSpuSkuAttrMapService {
    * spu下 有哪些销售属性
    */
   public getAttrIds(spuId: string): string[] {
-    const attrIds = this.productSpuSkuAttrMapRepository.query([{ field: 'spuId', value: spuId }]).map((item) => item.attrId);
+    const attrIds = this.productSpuSkuAttrMapRepository.query([{
+      field: 'spuId',
+      value: spuId,
+    }]).map((item) => item.attrId);
     return ArrayUtil.unique(attrIds);
   }
 
@@ -48,4 +54,17 @@ export class ProductSpuSkuAttrMapService {
 
     return ArrayUtil.unique(skuIds);
   }
+
+  /**
+   *  sku下，共有几个属性
+   */
+  public getAttrValueIdsBySkuId(skuId: string): string[] {
+    const valueIds = this.productSpuSkuAttrMapRepository
+      .query([
+        { field: 'skuId', value: skuId },
+      ])
+      .map((item) => item.attrValueId);
+    return ArrayUtil.unique(valueIds);
+  }
+
 }

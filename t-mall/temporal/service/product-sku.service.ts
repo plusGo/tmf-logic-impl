@@ -13,6 +13,8 @@ import { ProductSkuStockService } from './product-sku-stock.service';
 import { Logger } from '../../../core/util/logger';
 import { ProductSpuRepository } from '../dao/product-spu.repository';
 import { ProductSpu } from '../model/po/product-spu.model';
+import { PriceUtil } from '../../../core/util/price.util';
+import { ProductAttrValueRepository } from '../dao/product-attr-value.repository';
 
 @Injectable()
 export class ProductSkuService {
@@ -21,30 +23,32 @@ export class ProductSkuService {
   private productSpuSkuAttrMapRepository: ProductSpuSkuAttrMapRepository = inject(ProductSpuSkuAttrMapRepository);
   private productSkuStockService: ProductSkuStockService = inject(ProductSkuStockService);
   private productSpuSkuAttrMapService: ProductSpuSkuAttrMapService = inject(ProductSpuSkuAttrMapService);
+  private productSpuRepository: ProductSpuRepository = inject(ProductSpuRepository);
+  private productAttrValueRepository: ProductAttrValueRepository = inject(ProductAttrValueRepository);
 
-  save(sku: SkuSaveRequest): SkuDto {
-    const priceFree = Number(sku.price.replace('.', ''));
-    const priceScale = sku.price.indexOf('.') === -1 ? 0 : sku.price.length - 1 - sku.price.indexOf('.');
-    const marketPriceFree = Number(sku.marketPrice.replace('.', ''));
-    const marketPriceScale = sku.marketPrice.indexOf('.') === -1 ? 0 : sku.price.length - 1 - sku.price.indexOf('.');
+  save(skuRequest: SkuSaveRequest): SkuDto {
+    const priceFree = Number(skuRequest.price.replace('.', ''));
+    const priceScale = skuRequest.price.indexOf('.') === -1 ? 0 : skuRequest.price.length - 1 - skuRequest.price.indexOf('.');
+    const marketPriceFree = Number(skuRequest.marketPrice.replace('.', ''));
+    const marketPriceScale = skuRequest.marketPrice.indexOf('.') === -1 ? 0 : skuRequest.price.length - 1 - skuRequest.price.indexOf('.');
 
     const newSku: ProductSku = {
-      spuId: sku.spu.id,
+      spuId: skuRequest.spu.id,
       priceFree,
       priceScale,
       marketPriceFree,
       marketPriceScale,
-      attrs: sku.attrValues.map((item) => item.id).join('-'),
+      attrs: skuRequest.attrValues.map((item) => item.id).join('-'),
       id: IdUtil.UUID(),
     };
     this.productSkuRepository.save(newSku);
 
-    this.productSkuStockService.save(newSku.id, sku.quantity);
+    this.productSkuStockService.save(newSku.id, skuRequest.quantity);
 
-    sku.attrValues.forEach((item) => {
+    skuRequest.attrValues.forEach((item) => {
       const attr = this.productAttrRepository.findById(item.attrId) as ProductAttr;
       const newMap: ProductSpuSkuAttrMap = {
-        spuId: sku.spu.id,
+        spuId: skuRequest.spu.id,
         skuId: newSku.id,
         attrId: item.attrId,
         attrName: attr.name,
@@ -55,17 +59,17 @@ export class ProductSkuService {
       this.productSpuSkuAttrMapRepository.save(newMap);
     });
 
-    const skuName = `${sku.spu.name}${sku.attrValues.map((item) => item.value).join('')}`;
+    const skuName = `${skuRequest.spu.name}${skuRequest.attrValues.map((item) => item.value).join('')}`;
 
-    Logger.log('ProductSkuService', '创建SKU成功', 'SKU名称', skuName, '库存', `${sku.quantity}`);
+    Logger.log('ProductSkuService', '创建SKU成功', 'SKU名称', skuName, '库存', `${skuRequest.quantity}`);
 
     return {
       id: newSku.id,
       name: skuName,
-      desc: sku.spu.desc,
-      unit: sku.spu.unit,
-      price: sku.price,
-      marketPrice: sku.marketPrice,
+      desc: skuRequest.spu.desc,
+      unit: skuRequest.spu.unit,
+      price: skuRequest.price,
+      marketPrice: skuRequest.marketPrice,
     };
   }
 
@@ -80,8 +84,20 @@ export class ProductSkuService {
   }
 
   getDetail(skuId: string): SkuDto {
-    const sku = this.productSkuRepository.findById(skuId);
-    // todo
-    return undefined;
+    const sku = this.productSkuRepository.findById(skuId) as ProductSku;
+    const spu = this.productSpuRepository.findById(sku?.spuId as string) as ProductSpu;
+    const names = this.productSpuSkuAttrMapService.getAttrValueIdsBySkuId(skuId).map(valueId =>{
+      return this.productAttrValueRepository.findById(valueId)?.value
+    }).join('');
+    this.productAttrRepository
+    const skuName = `${spu.name}${names}`;
+    return {
+      id: skuId,
+      name: skuName,
+      desc: spu.desc,
+      unit: spu.unit,
+      price: PriceUtil.transform(sku.priceFree,sku.priceScale),
+      marketPrice: PriceUtil.transform(sku.marketPriceFree,sku.marketPriceScale),
+    };
   }
 }

@@ -7,11 +7,13 @@ import { TokenUtil } from '../../../core/util/token.util';
 import { Logger } from '../../../core/util/logger';
 import { ProductSkuController } from '../../temporal/controller/product-sku.controller';
 import { UserToken } from '../../../core/model/dto/user-token.model';
+import { OrderController } from '../../order/controller/order.controller';
 
 @Injectable()
 export class ShoppingCartService {
   private shoppingCartItemRepository: ShoppingCartItemRepository = inject(ShoppingCartItemRepository);
   private productSkuController: ProductSkuController = inject(ProductSkuController);
+  private orderController: OrderController = inject(OrderController);
 
   saveSKU(skuId: string, quantity: number): void {
     const shoppingCartItem = this.shoppingCartItemRepository.queryOne([{ field: 'skuId', value: skuId }]);
@@ -43,5 +45,10 @@ export class ShoppingCartService {
         };
       }),
     };
+  }
+
+  buyAll(): void {
+    const cartItems = this.getDetail()?.items || [];
+
   }
 }

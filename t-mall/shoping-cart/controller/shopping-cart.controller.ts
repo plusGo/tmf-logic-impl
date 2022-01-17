@@ -19,4 +19,11 @@ export class ShoppingCartController {
   public getDetail(): ShoppingCartDetailDto | null {
     return this.shoppingCartService.getDetail();
   }
+
+  /**
+   *  购买购物车全部的物品
+   */
+  public buyAll(): void {
+    this.shoppingCartService.buyAll();
+  }
 }

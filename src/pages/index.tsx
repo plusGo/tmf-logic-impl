@@ -106,10 +106,16 @@ export default function IndexPage() {
   shoppingCartController.saveSKU(sku4.id, 100);
   shoppingCartController.saveSKU(sku4.id, 100);
   // 买200台 Mac pro 黑色13寸
-  shoppingCartController.saveSKU(sku3.id, 200);
+  shoppingCartController.saveSKU(sku3.id, 220);
+
+  // 获取购物车的详情，并打印
+  const cartDetail = shoppingCartController.getDetail();
+  console.log(cartDetail);
+  // 购买购物车全部的物品
+  shoppingCartController.buyAll();
   // 获取spu详情
-  const spuDetail = productSpuController.getDetail(spu.id);
-  console.log(spuDetail);
+  // const spuDetail = productSpuController.getDetail(spu.id);
+  // console.log(spuDetail);
 
   const a = inject<TradeController>(TradeController);
   a.goPay();
