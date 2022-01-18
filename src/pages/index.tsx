@@ -1,5 +1,5 @@
 import styles from './index.less';
-import { TradeController } from '../../t-mall/trade/controller/trade-controller';
+import { CashRegisterController } from '../../t-mall/trade/controller/cash-register.controller';
 import { inject } from '../../core/util/bean-factory';
 import { AccountUserController } from '../../t-mall/account/controller/account-user.controller';
 import { TokenUtil } from '../../core/util/token.util';
@@ -9,6 +9,7 @@ import { ProductSpuController } from '../../t-mall/temporal/controller/product-s
 import { ProductAttrController } from '../../t-mall/temporal/controller/product-attr.controller';
 import { ProductSkuController } from '../../t-mall/temporal/controller/product-sku.controller';
 import { ShoppingCartController } from '../../t-mall/shoping-cart/controller/shopping-cart.controller';
+import { Logger } from '../../core/util/logger';
 
 export default function IndexPage() {
   const userController = inject<AccountUserController>(AccountUserController);
@@ -18,6 +19,7 @@ export default function IndexPage() {
   const productAttrController = inject<ProductAttrController>(ProductAttrController);
   const productSkuController = inject<ProductSkuController>(ProductSkuController);
   const shoppingCartController = inject<ShoppingCartController>(ShoppingCartController);
+  const cashRegisterController = inject<CashRegisterController>(CashRegisterController);
 
   // 注册用户
   userController.register({
@@ -25,6 +27,7 @@ export default function IndexPage() {
     userName: 'Henry',
     phone: '18628110404',
     password: '123456',
+    address: '四川省 成都市 双流区 南湖逸家',
   });
 
   // 登录
@@ -91,7 +94,7 @@ export default function IndexPage() {
     spu,
     price: '11999.99',
     marketPrice: '12999.99',
-    quantity: 200,
+    quantity: 1000,
     attrValues: [attr1.values[0], attr2.values[1]],
   });
   // 创建sku 黑色14寸 500台
@@ -99,26 +102,31 @@ export default function IndexPage() {
     spu,
     price: '11999.99',
     marketPrice: '12999.99',
-    quantity: 200,
+    quantity: 500,
     attrValues: [attr1.values[1], attr2.values[1]],
   });
-  // 买100台 Mac pro 黑色14寸
+  // 加入购物车100台 Mac pro 黑色14寸
   shoppingCartController.saveSKU(sku4.id, 100);
   shoppingCartController.saveSKU(sku4.id, 100);
-  // 买200台 Mac pro 黑色13寸
+  // 加入购物车220台 Mac pro 黑色13寸
   shoppingCartController.saveSKU(sku3.id, 220);
 
   // 获取购物车的详情，并打印
   const cartDetail = shoppingCartController.getDetail();
   console.log(cartDetail);
-  // 购买购物车全部的物品
-  shoppingCartController.buyAll();
+  // 购买购物车全部的物品,获取到了一个订单
+  const order = shoppingCartController.buyAll();
+  // 提交订单给交易系统，获取到可以用的支付方式列表
+  const cashRegisterModel = cashRegisterController.goPay(order);
+  setInterval(() => {
+    Logger.log('主线程', '支付剩余时间', parseInt(cashRegisterModel.getTimeRemaining() as any) + '秒');
+  }, 1000);
+  cashRegisterModel.aliPay();
+
   // 获取spu详情
   // const spuDetail = productSpuController.getDetail(spu.id);
   // console.log(spuDetail);
 
-  const a = inject<TradeController>(TradeController);
-  a.goPay();
   return (
     <div>
       <h1 className={styles.title}>Pa1ge index</h1>

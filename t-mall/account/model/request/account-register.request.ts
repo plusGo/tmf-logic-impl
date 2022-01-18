@@ -6,4 +6,5 @@ export interface AccountRegisterRequest {
   phone: string;
   userName: string;
   password: string;
+  address: string; // 收货地址
 }

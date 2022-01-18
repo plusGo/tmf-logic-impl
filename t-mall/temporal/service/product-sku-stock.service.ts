@@ -15,6 +15,18 @@ export class ProductSkuStockService {
     return ret.quantity;
   }
 
+  reduceQuantityAndValidate(skuId: string, count: number): boolean {
+    const ret = this.productSkuStockRepository.query([{ field: 'skuId', value: skuId }])[0] as ProductSkuStock;
+
+    const quantity = ret.quantity;
+    if (count > quantity) {
+      return false;
+    } else {
+      this.productSkuStockRepository.updateOne(ret.id, { quantity: quantity - count });
+      return true;
+    }
+  }
+
   save(skuId: string, quantity: number): ProductSkuStock {
     const newStock: ProductSkuStock = {
       skuId: skuId,

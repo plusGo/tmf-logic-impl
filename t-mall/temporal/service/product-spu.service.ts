@@ -53,8 +53,8 @@ export class ProductSpuService {
       desc: spu.desc,
       sellingPoint: spu.sellingPoint,
       unit: spu.unit,
-      price: PriceUtil.transform(spu.priceFree, spu.priceScale),
-      marketPrice: PriceUtil.transform(spu.marketPriceFree, spu.marketPriceScale),
+      price: PriceUtil.transformToString(spu.priceFree, spu.priceScale),
+      marketPrice: PriceUtil.transformToString(spu.marketPriceFree, spu.marketPriceScale),
       attrs: this.productAttrService.getAttrsWithSpus(spu.id),
       skus: skuIds.map((skuId) => {
         return `${this.productSkuStockService.getQuantity(skuId)},${skuId}`;

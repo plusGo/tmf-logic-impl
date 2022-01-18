@@ -1,10 +1,11 @@
 /**
- * 币种
+ * 商品订单状态
  */
 export enum OrderStatus {
-  DRAFT = '草稿',
-  TO_PAY = '待支付',
-  PAYING = '支付中',
-  PAYED = '已支付',
-  PAY_FAILED = '支付失败'
+  WAIT_START_PAY = '待付款',
+  WAIT_START_SEND = '待发货',
+  SENDED = '已发货',
+  COMPLETED = '已完成',
+  CLOSED = '已关闭',
+  INVALID = '无效订单',
 }

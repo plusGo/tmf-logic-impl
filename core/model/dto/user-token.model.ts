@@ -7,4 +7,5 @@ export class UserToken {
   phone?: string;
   userName?: string;
   password?: string;
+  address?: string;
 }

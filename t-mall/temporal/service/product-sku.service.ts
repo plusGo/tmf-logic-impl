@@ -86,18 +86,20 @@ export class ProductSkuService {
   getDetail(skuId: string): SkuDto {
     const sku = this.productSkuRepository.findById(skuId) as ProductSku;
     const spu = this.productSpuRepository.findById(sku?.spuId as string) as ProductSpu;
-    const names = this.productSpuSkuAttrMapService.getAttrValueIdsBySkuId(skuId).map(valueId =>{
-      return this.productAttrValueRepository.findById(valueId)?.value
-    }).join('');
-    this.productAttrRepository
+    const names = this.productSpuSkuAttrMapService
+      .getAttrValueIdsBySkuId(skuId)
+      .map((valueId) => {
+        return this.productAttrValueRepository.findById(valueId)?.value;
+      })
+      .join('');
     const skuName = `${spu.name}${names}`;
     return {
       id: skuId,
       name: skuName,
       desc: spu.desc,
       unit: spu.unit,
-      price: PriceUtil.transform(sku.priceFree,sku.priceScale),
-      marketPrice: PriceUtil.transform(sku.marketPriceFree,sku.marketPriceScale),
+      price: PriceUtil.transformToString(sku.priceFree, sku.priceScale),
+      marketPrice: PriceUtil.transformToString(sku.marketPriceFree, sku.marketPriceScale),
     };
   }
 }

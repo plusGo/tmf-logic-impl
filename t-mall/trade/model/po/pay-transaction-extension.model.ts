@@ -11,5 +11,5 @@ export interface PayTransactionExtension extends BaseModel {
   payMethod: PayMethod; // 支付方式
   transaction_code: string; // 生成传输给第三方的订单号
   callNum: number; // 发起调用的次数
-  extensionData: string; // 扩展内容，需要保存：transaction_code 与 trade no 的映射关系，异步通知的时候填充
+  extensionData: string; // 扩展内容，需要保存：transactionCode 与 trade no 的映射关系，异步通知的时候填充
 }
