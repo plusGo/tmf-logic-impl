@@ -30,8 +30,8 @@ export interface AliPayRequest {
   notify_callback: (params: AliPayResponse) => void; // 回调函数
   out_trade_no: string; // 商户订单号。由商家自定义，64个字符以内，仅支持字母、数字、下划线且需保证在商户端不重复
   total_amount: string; // 订单总金额，单位为元
-  subject: string; // 订单标题
   time_expire: number; // 过期时间
+  subject?: string; // 订单标题
 }
 
 export interface AliPayResponse {
@@ -40,4 +40,5 @@ export interface AliPayResponse {
   out_trade_no: string; // 商户订单号。由商家自定义，64个字符以内，仅支持字母、数字、下划线且需保证在商户端不重复
   total_amount: string; // 订单总金额，单位为元
   payment_time: number; // 用户支付成功的时间
+  time_expire: number; // 过期时间
 }
