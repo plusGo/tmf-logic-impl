@@ -14,6 +14,7 @@ export class AliPayGateway {
       out_trade_no: request.out_trade_no,
       total_amount: request.total_amount,
       payment_time: new Date().getTime(),
+      time_expire: request.time_expire,
     };
     this.notify(response, request.notify_callback);
   }
