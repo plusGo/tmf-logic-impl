@@ -8,11 +8,11 @@ import { AliPayController } from '../../../../fake-pay/ali-pay/controller/ali-pa
 import { AliPayRequest } from '../../../../fake-pay/ali-pay/model/request/ali-pay.request';
 import { PriceUtil } from '../../../../core/util/price.util';
 import { AliPayResponse } from '../../../../fake-pay/ali-pay/model/response/ali-pay.response';
-import { CashRegisterController } from '../../controller/cash-register.controller';
+import { TradeController } from '../../controller/trade.controller';
 
 export class CashRegisterModel {
   aliPayController = inject<AliPayController>(AliPayController);
-  cashRegisterController = inject<CashRegisterController>(CashRegisterController);
+  cashRegisterController = inject<TradeController>(TradeController);
 
   constructor(private payTransaction: PayTransaction) {
     this.payTransaction = payTransaction;

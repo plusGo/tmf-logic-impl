@@ -10,12 +10,14 @@ import { UserToken } from '../../../core/model/dto/user-token.model';
 import { OrderController } from '../../order/controller/order.controller';
 import { OrderSaveRequest } from '../../order/model/request/order-save.request';
 import { OrderDto } from '../../order/model/dto/order.dto';
+import { TradeController } from '../../trade/controller/trade.controller';
 
 @Injectable()
 export class ShoppingCartService {
   private shoppingCartItemRepository: ShoppingCartItemRepository = inject(ShoppingCartItemRepository);
   private productSkuController: ProductSkuController = inject(ProductSkuController);
   private orderController: OrderController = inject(OrderController);
+  private tradeController: TradeController = inject(TradeController);
 
   saveSKU(skuId: string, quantity: number): void {
     const shoppingCartItem = this.shoppingCartItemRepository.queryOne([{ field: 'skuId', value: skuId }]);
@@ -78,4 +80,6 @@ export class ShoppingCartService {
     };
     return this.orderController.save(saveOrderReq);
   }
+
+  private trade(): void {}
 }

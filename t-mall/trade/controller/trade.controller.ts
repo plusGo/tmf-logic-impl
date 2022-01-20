@@ -1,25 +1,17 @@
 import { inject, Injectable } from '../../../core/util/bean-factory';
 import { OrderDto } from '../../order/model/dto/order.dto';
-import { CashRegisterService } from '../service/cash-register.service';
+import { TradeService } from '../service/trade.service';
 import { CashRegisterModel } from '../model/dto/cash-register.model';
-import { AliPayResponse } from '../../../fake-pay/ali-pay/model/response/ali-pay.response';
 
 @Injectable()
-export class CashRegisterController {
-  cashRegisterService = inject<CashRegisterService>(CashRegisterService);
+export class TradeController {
+  tradeService = inject<TradeService>(TradeService);
 
   /**
    *  发起支付
    */
-  public goPay(goodsOrder: OrderDto): CashRegisterModel {
-    return this.cashRegisterService.goPay(goodsOrder);
-  }
-
-  /**
-   *  阿里支付回调
-   */
-  public aliPayNotify(res: AliPayResponse): void {
-    return this.cashRegisterService.aliPayNotify(res);
+  public pay(goodsOrder: OrderDto): CashRegisterModel {
+    return this.tradeService.goPay(goodsOrder);
   }
 
   /**

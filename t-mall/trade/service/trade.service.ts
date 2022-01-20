@@ -12,13 +12,15 @@ import { DateUtil } from '../../../core/util/date.util';
 import { PayTransactionRepository } from '../dao/pay-transaction.repository';
 import { AliPayResponse } from '../../../fake-pay/ali-pay/model/response/ali-pay.response';
 import { PayMethod } from '../model/enum/pay-method.enum';
+import { OpenPayService } from '../pay/service/open-pay.service';
 
 @Injectable()
-export class CashRegisterService {
+export class TradeService {
   payTransactionRepository = inject<PayTransactionRepository>(PayTransactionRepository);
+  openPayService = inject<OpenPayService>(OpenPayService);
 
   public goPay(goodsOrder: OrderDto): CashRegisterModel {
-    Logger.log('CashRegisterService', '发起了支付', IdUtil.UUID());
+    Logger.log('TradeService', '发起了支付', IdUtil.UUID());
 
     const newPayTransaction: Partial<PayTransaction> = {
       id: IdUtil.UUID(),
@@ -40,12 +42,20 @@ export class CashRegisterService {
 
   aliPayNotify(res: AliPayResponse): void {
     debugger;
-    const transaction = this.payTransactionRepository.queryOne([{ field: 'appOrderId', value: res.appOrderId }]) as PayTransaction;
+    const transaction = this.payTransactionRepository.queryOne([
+      {
+        field: 'appOrderId',
+        value: res.appOrderId,
+      },
+    ]) as PayTransaction;
     const updateValue: Partial<PayTransaction> = {
       payMethod: PayMethod.ALI_PAY,
       payChannel: '信用卡',
-      payChannel: '信用卡',
     };
     this.payTransactionRepository.updateOne(transaction.id, updateValue);
+  }
+
+  openPayNotify(payMethod: PayMethod, response: any): void {
+    this.openPayService.buildStandardReturnData();
   }
 }

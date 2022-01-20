@@ -15,6 +15,7 @@ export class AliPayGateway {
       total_amount: request.total_amount,
       payment_time: new Date().getTime(),
       time_expire: request.time_expire,
+      channel: '信用卡',
     };
     this.notify(response, request.notify_callback);
   }
@@ -42,4 +43,5 @@ export interface AliPayResponse {
   total_amount: string; // 订单总金额，单位为元
   payment_time: number; // 用户支付成功的时间
   time_expire: number; // 过期时间
+  channel: string; // 如支付宝中的花呗、信用卡等
 }

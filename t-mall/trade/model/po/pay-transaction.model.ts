@@ -17,16 +17,16 @@ export interface PayTransaction extends BaseModel {
   totalFree: number; //支付金额
   scale: number; // 金额对应的小数位数
   currencyCode: CurrencyCode; //交易的币种
-  payChannel: string; //选择的支付渠道，如支付宝中的花呗、信用卡等
+  payChannel: string; // 选择的支付渠道，如支付宝中的花呗、信用卡等
   expireTime: number; //订单过期时间
-  returnUrl: string; // 支付后跳转的URL
-  notifyUrl: string; //支付后异步通知的URL
-  phone: string; //用户的邮箱
+  returnUrl?: string; // 支付后跳转的URL
+  notifyUrl?: string; //支付后异步通知的URL
+  phone: string; //用户的电话
   signType: SignType; //采用的加签算法
   paymentTime: number; // 第三方支付成功的时间
   notifyTime: number; // 收到异步通知的时间
   finishTime: number; // 通知上游系统的时间
   tradeNo: string; // 第三方的流水号
-  transactionCode: string; // 真实给第三方的交易code，异步通知的时候更新
+  transactionCode?: string; // 真实给第三方的交易code，异步通知的时候更新
   orderStatus: OrderStatus;
 }

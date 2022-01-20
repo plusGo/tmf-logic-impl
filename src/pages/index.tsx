@@ -1,5 +1,5 @@
 import styles from './index.less';
-import { CashRegisterController } from '../../t-mall/trade/controller/cash-register.controller';
+import { TradeController } from '../../t-mall/trade/controller/trade.controller';
 import { inject } from '../../core/util/bean-factory';
 import { AccountUserController } from '../../t-mall/account/controller/account-user.controller';
 import { TokenUtil } from '../../core/util/token.util';
@@ -19,7 +19,7 @@ export default function IndexPage() {
   const productAttrController = inject<ProductAttrController>(ProductAttrController);
   const productSkuController = inject<ProductSkuController>(ProductSkuController);
   const shoppingCartController = inject<ShoppingCartController>(ShoppingCartController);
-  const cashRegisterController = inject<CashRegisterController>(CashRegisterController);
+  const cashRegisterController = inject<TradeController>(TradeController);
 
   // 注册用户
   userController.register({
@@ -117,7 +117,7 @@ export default function IndexPage() {
   // 购买购物车全部的物品,获取到了一个订单
   const order = shoppingCartController.buyAll();
   // 提交订单给交易系统，获取到可以用的支付方式列表
-  const cashRegisterModel = cashRegisterController.goPay(order);
+  const cashRegisterModel = cashRegisterController.pay(order);
   setInterval(() => {
     Logger.log('主线程', '支付剩余时间', parseInt(cashRegisterModel.getTimeRemaining() as any) + '秒');
   }, 1000);

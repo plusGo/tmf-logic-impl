@@ -7,12 +7,7 @@ import { PayProxyInterface } from '../proxy/pay-proxy.interface';
 export class PayContext {
   aliPayProxy = inject<AliPayProxy>(AliPayProxy);
 
-  openPayNotify(payMethod: PayMethod, response: any) {
-    const payProxy = this.getProxy(payMethod);
-    const standardReturnData = payProxy.buildStandardReturnData(response);
-  }
-
-  private getProxy(payMethod: PayMethod): PayProxyInterface {
+  getProxy(payMethod: PayMethod): PayProxyInterface {
     if (payMethod === PayMethod.ALI_PAY) {
       return this.aliPayProxy;
     } else if (payMethod === PayMethod.CMB_PAY) {

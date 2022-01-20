@@ -22,7 +22,7 @@ export class AliPayProxy implements PayProxyInterface {
       total_amount: PriceUtil.transformToString(params.totalFree, params.scale), // 订单总金额，单位为元
       time_expire: params.expireTime, // 过期时间
       notify_callback: (res: any) => {
-        this.openPayNotifyController.openPayNotidy(PayMethod.ALI_PAY, res);
+        this.openPayNotifyController.openPayNotify(PayMethod.ALI_PAY, res);
       },
     };
     this.aliPayGateway.alipay(aliPayReq);
@@ -37,6 +37,7 @@ export class AliPayProxy implements PayProxyInterface {
       expireTime: params.time_expire, // 订单过期时间，也可用作支付过期时间
       paymentTime: params.payment_time, // 用户支付成功的时间
       payMethod: PayMethod.ALI_PAY, // 支付方式
+      payChannel: params.channel, // 支付渠道
     };
   }
 }
