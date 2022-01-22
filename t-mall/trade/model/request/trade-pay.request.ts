@@ -7,6 +7,7 @@ import { PayMethod } from '../enum/pay-method.enum';
  * 创建支付订单
  */
 export interface TradePayRequest {
+  appId: string; // 第三方应用的ID
   appOrderId: string; //应用方订单号
   totalFree: number; //支付金额
   scale: number; // 金额对应的小数位数

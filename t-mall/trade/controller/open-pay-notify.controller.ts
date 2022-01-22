@@ -1,5 +1,4 @@
 import { inject, Injectable } from '../../../core/util/bean-factory';
-import { PayContext } from '../pay/context/pay-context';
 import { PayMethod } from '../model/enum/pay-method.enum';
 import { TradeService } from '../service/trade.service';
 
@@ -8,9 +7,7 @@ import { TradeService } from '../service/trade.service';
  */
 @Injectable()
 export class OpenPayNotifyController {
-  tradeService = inject<TradeService>(TradeService);
-
   public openPayNotify(payMethod: PayMethod, response: any): void {
-    return this.tradeService.openPayNotify(payMethod, response);
+    return inject<TradeService>(TradeService).openPayNotify(payMethod, response);
   }
 }

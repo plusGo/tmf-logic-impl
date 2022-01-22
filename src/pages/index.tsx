@@ -10,6 +10,8 @@ import { ProductAttrController } from '../../t-mall/temporal/controller/product-
 import { ProductSkuController } from '../../t-mall/temporal/controller/product-sku.controller';
 import { ShoppingCartController } from '../../t-mall/shoping-cart/controller/shopping-cart.controller';
 import { Logger } from '../../core/util/logger';
+import { ShoppingCartTradeController } from '../../t-mall/shoping-cart/controller/shopping-cart-trade.controller';
+import { OpenPayNotifyController } from '../../t-mall/trade/controller/open-pay-notify.controller';
 
 export default function IndexPage() {
   const userController = inject<AccountUserController>(AccountUserController);
@@ -19,7 +21,7 @@ export default function IndexPage() {
   const productAttrController = inject<ProductAttrController>(ProductAttrController);
   const productSkuController = inject<ProductSkuController>(ProductSkuController);
   const shoppingCartController = inject<ShoppingCartController>(ShoppingCartController);
-  const cashRegisterController = inject<TradeController>(TradeController);
+  const shoppingCartTradeController = inject<ShoppingCartTradeController>(ShoppingCartTradeController);
 
   // 注册用户
   userController.register({
@@ -116,12 +118,13 @@ export default function IndexPage() {
   console.log(cartDetail);
   // 购买购物车全部的物品,获取到了一个订单
   const order = shoppingCartController.buyAll();
-  // 提交订单给交易系统，获取到可以用的支付方式列表
-  const cashRegisterModel = cashRegisterController.pay(order);
-  setInterval(() => {
-    Logger.log('主线程', '支付剩余时间', parseInt(cashRegisterModel.getTimeRemaining() as any) + '秒');
-  }, 1000);
-  cashRegisterModel.aliPay();
+  // 购物车结算
+  const tradePromise = shoppingCartTradeController.trade(order);
+
+
+  tradePromise.then((val)=>{
+    debugger
+  })
 
   // 获取spu详情
   // const spuDetail = productSpuController.getDetail(spu.id);

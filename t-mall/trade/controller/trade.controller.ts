@@ -1,7 +1,7 @@
 import { inject, Injectable } from '../../../core/util/bean-factory';
-import { OrderDto } from '../../order/model/dto/order.dto';
 import { TradeService } from '../service/trade.service';
-import { CashRegisterModel } from '../model/dto/cash-register.model';
+import { TradePayRequest } from '../model/request/trade-pay.request';
+import { PayTransaction } from '../model/po/pay-transaction.model';
 
 @Injectable()
 export class TradeController {
@@ -10,42 +10,49 @@ export class TradeController {
   /**
    *  发起支付
    */
-  public pay(goodsOrder: OrderDto): CashRegisterModel {
-    return this.tradeService.goPay(goodsOrder);
+  public pay(tradePayRequest: TradePayRequest): Promise<PayTransaction> {
+    return this.tradeService.pay(tradePayRequest);
   }
 
   /**
    *  发起退款
    */
-  public refund(): void {}
+  public refund(): void {
+  }
 
   /**
    *  接口异步通知
    */
-  public notify(channel: string, sellerTradeNumber: string): void {}
+  public notify(channel: string, sellerTradeNumber: string): void {
+  }
 
   /**
    *  接口同步通知
    */
-  public return(channel: string, sellerTradeNumber: string): void {}
+  public return(channel: string, sellerTradeNumber: string): void {
+  }
 
   /**
    *  交易查询
    */
-  public queryTrade(): void {}
+  public queryTrade(): void {
+  }
 
   /**
    *  退款查询
    */
-  public queryRefund(): void {}
+  public queryRefund(): void {
+  }
 
   /**
    *  账单获取
    */
-  public queryBill(): void {}
+  public queryBill(): void {
+  }
 
   /**
    *  结算明细获取
    */
-  public querySettle(): void {}
+  public querySettle(): void {
+  }
 }

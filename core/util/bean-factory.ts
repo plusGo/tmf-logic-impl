@@ -20,7 +20,7 @@ export const Injectable = (): ClassDecorator => (...args) => {
   }
 };
 
-export function inject<T>(keys: any): T {
+export const inject = <T>(keys: any): T => {
   if (keys && Array.isArray(keys)) {
     const result = [] as any;
     keys.forEach($item => {
@@ -28,6 +28,7 @@ export function inject<T>(keys: any): T {
     });
     return result;
   }
-  return BeanFactory.safeGet(keys) as T;
-}
+  const ret =  BeanFactory.safeGet(keys) as T;
+  return ret;
+};
 

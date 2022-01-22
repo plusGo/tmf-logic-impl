@@ -1,61 +1,97 @@
 import { inject, Injectable } from '../../../core/util/bean-factory';
-import { Logger } from '../../../core/util/logger';
 import { IdUtil } from '../../../core/util/id.util';
-import { OrderDto } from '../../order/model/dto/order.dto';
-import { CashRegisterModel } from '../model/dto/cash-register.model';
 import { PayTransaction } from '../model/po/pay-transaction.model';
-import { CurrencyCode } from '../model/enum/currency-code.enum';
-import { SignType } from '../model/enum/sign-type.enum';
 import { OrderStatus } from '../model/enum/order-status.enum';
-import { PriceUtil } from '../../../core/util/price.util';
-import { DateUtil } from '../../../core/util/date.util';
 import { PayTransactionRepository } from '../dao/pay-transaction.repository';
-import { AliPayResponse } from '../../../fake-pay/ali-pay/model/response/ali-pay.response';
 import { PayMethod } from '../model/enum/pay-method.enum';
 import { OpenPayService } from '../pay/service/open-pay.service';
+import { TradePayRequest } from '../model/request/trade-pay.request';
+import { PayLogData } from '../model/po/pay-log-data.model';
+import { LogType } from '../model/enum/log-type.enum';
+import { PayLogDataRepository } from '../dao/pay-log-data.repository';
+import { PayParamsInterface } from '../pay/model/pay-params.interface';
+import { Logger } from '../../../core/util/logger';
 
 @Injectable()
 export class TradeService {
+  callBackCache: { [key: string]: (newTransaction: PayTransaction) => void } = {};
   payTransactionRepository = inject<PayTransactionRepository>(PayTransactionRepository);
+  payLogDataRepository = inject<PayLogDataRepository>(PayLogDataRepository);
   openPayService = inject<OpenPayService>(OpenPayService);
 
-  public goPay(goodsOrder: OrderDto): CashRegisterModel {
-    Logger.log('TradeService', '发起了支付', IdUtil.UUID());
+  pay(tradePayRequest: TradePayRequest): Promise<PayTransaction> {
+    Logger.log('TradeService', '发起支付', '请求内容', JSON.stringify(tradePayRequest));
 
+    const transactionId = IdUtil.UUID();
+    // 打日志
+    const newPayLog: PayLogData = {
+      id: IdUtil.UUID(),
+      appId: tradePayRequest.appId, // 第三方应用的ID
+      appOrderId: tradePayRequest.appOrderId, //应用方订单号
+      transactionId: transactionId, // 系统唯一交易ID
+      requestHeader: '', // 请求的header头
+      requestParams: JSON.stringify(tradePayRequest), // 支付的请求参数
+      logType: LogType.PAYMENT, // 日志类型
+    };
+    this.payLogDataRepository.save(newPayLog);
+
+    // 生成流水
     const newPayTransaction: Partial<PayTransaction> = {
       id: IdUtil.UUID(),
-      appOrderId: goodsOrder.orderId, //应用方订单号
-      transactionId: IdUtil.UUID(), //本次交易唯一id，整个支付系统唯一，生成他的原因主要是 order_id对于其它应用来说可能重复
-      totalFree: PriceUtil.transformToNumber(goodsOrder.finalAmount + '')[0], //支付金额
-      scale: PriceUtil.transformToNumber(goodsOrder.finalAmount + '')[1], // 金额对应的小数位数
-      currencyCode: CurrencyCode.CNY, //交易的币种
-      expireTime: DateUtil.plusMinutes(new Date().getTime(), 30), //订单过期时间
-      phone: goodsOrder.address.phone, //用户的邮箱
-      signType: SignType.MD5, //采用的加签算法
+      appOrderId: tradePayRequest.appOrderId, //应用方订单号
+      transactionId: transactionId, //本次交易唯一id，整个支付系统唯一，生成他的原因主要是 order_id对于其它应用来说可能重复
+      totalFree: tradePayRequest.totalFree, //支付金额
+      scale: tradePayRequest.scale, // 金额对应的小数位数
+      currencyCode: tradePayRequest.currencyCode, //交易的币种
+      expireTime: tradePayRequest.expireTime, //订单过期时间
+      phone: tradePayRequest.phone, //用户的邮箱
+      signType: tradePayRequest.signType, //采用的加签算法
       orderStatus: OrderStatus.WAIT_START_PAY,
     };
-    this.payTransactionRepository.save(newPayTransaction as any);
+    this.payTransactionRepository.save(newPayTransaction as PayTransaction);
 
-    const cashRegisterModel = new CashRegisterModel(newPayTransaction as PayTransaction);
-    return cashRegisterModel;
-  }
-
-  aliPayNotify(res: AliPayResponse): void {
-    debugger;
-    const transaction = this.payTransactionRepository.queryOne([
-      {
-        field: 'appOrderId',
-        value: res.appOrderId,
-      },
-    ]) as PayTransaction;
-    const updateValue: Partial<PayTransaction> = {
-      payMethod: PayMethod.ALI_PAY,
-      payChannel: '信用卡',
+    // 发起第三方支付
+    const openPayRequest: PayParamsInterface = {
+      transactionId: transactionId, // 内部交易系统的交易流水ID
+      totalFree: tradePayRequest.totalFree, // 支付金额
+      scale: tradePayRequest.scale, // 金额对应的小数位数
+      expireTime: tradePayRequest.expireTime, // 订单过期时间，也可用作支付过期时间
+      appOrderId: tradePayRequest.appOrderId, // 应用方的商品订单号
+      payMethod: tradePayRequest.payMethod, // 支付方式
     };
-    this.payTransactionRepository.updateOne(transaction.id, updateValue);
+    this.openPayService.pay(tradePayRequest.payMethod, openPayRequest);
+
+
+    return new Promise<PayTransaction>((resolve) => {
+      this.callBackCache[newPayTransaction.appOrderId as string] = (newTransaction: PayTransaction) => {
+        resolve(newTransaction);
+      };
+    });
   }
 
   openPayNotify(payMethod: PayMethod, response: any): void {
-    this.openPayService.buildStandardReturnData();
+    Logger.log('TradeService', `收到第三方${payMethod}支付发起的回调`, '回调内容', JSON.stringify(response));
+    const standardReturnData = this.openPayService.buildStandardReturnData(payMethod, response);
+    // 找到目标订单
+    const payTransaction = this.payTransactionRepository.queryOne([{
+      field: 'appOrderId',
+      value: standardReturnData.appOrderId,
+    }]) as PayTransaction;
+    this.payTransactionRepository.updateOne(payTransaction.id, {
+      tradeNo: standardReturnData.tradeNo,
+      payChannel: standardReturnData.payChannel,
+      paymentTime: standardReturnData.paymentTime,
+      notifyTime: new Date().getTime(),
+      finishTime: new Date().getTime(),
+      orderStatus: OrderStatus.COMPLETE_PAY,
+    });
+    const newPayTransaction = this.payTransactionRepository.findById(payTransaction.id) as PayTransaction;
+
+    const callBack = this.callBackCache[standardReturnData.appOrderId] as any;
+    if (callBack) {
+      callBack(newPayTransaction);
+    }
   }
+
+
 }

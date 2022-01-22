@@ -2,7 +2,7 @@ import { PayProxyInterface } from './pay-proxy.interface';
 import { PayReturnDataInterface } from '../model/pay-return-data.interface';
 import { PayParamsInterface } from '../model/pay-params.interface';
 import { AliPayGateway, AliPayRequest, AliPayResponse } from '../gateway/ali-pay.gateway';
-import { inject } from '../../../../core/util/bean-factory';
+import { inject, Injectable } from '../../../../core/util/bean-factory';
 import { PriceUtil } from '../../../../core/util/price.util';
 import { OpenPayNotifyController } from '../../controller/open-pay-notify.controller';
 import { PayMethod } from '../../model/enum/pay-method.enum';
@@ -10,7 +10,7 @@ import { PayMethod } from '../../model/enum/pay-method.enum';
 const ALI_PAY_CONFIG = {
   app_id: '8eff147c-acd2-4931-be62-e87e27699078',
 };
-
+@Injectable()
 export class AliPayProxy implements PayProxyInterface {
   aliPayGateway = inject<AliPayGateway>(AliPayGateway);
   openPayNotifyController = inject<OpenPayNotifyController>(OpenPayNotifyController);
@@ -22,6 +22,7 @@ export class AliPayProxy implements PayProxyInterface {
       total_amount: PriceUtil.transformToString(params.totalFree, params.scale), // 订单总金额，单位为元
       time_expire: params.expireTime, // 过期时间
       notify_callback: (res: any) => {
+
         this.openPayNotifyController.openPayNotify(PayMethod.ALI_PAY, res);
       },
     };
